@@ -45,7 +45,7 @@ type alias Interface =
     , types : Types
     , unions : Unions
     , aliases : Aliases
-    , fixities : Infix
+    , fixities : Infixes
     }
 
 
@@ -147,6 +147,11 @@ type Home
 
 
 {-| -}
+type alias Infixes =
+    List Infix
+
+
+{-| -}
 type alias Infix =
     { op : String
     , associativity : Assoc
@@ -174,7 +179,7 @@ parseInterface =
                 |= parseTypes
                 |= parseUnions
                 |= parseAliases
-                |= parseInfix
+                |= parseInfixes
         )
 
 
@@ -360,6 +365,12 @@ parseAliasedCanonical =
                 , ( 1, parse Filled |= parseCanonical )
                 ]
         )
+
+
+{-| -}
+parseInfixes : Parser (List Infix)
+parseInfixes =
+    parseList parseInfix
 
 
 {-| -}
