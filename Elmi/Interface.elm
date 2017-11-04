@@ -15,17 +15,20 @@ module Elmi.Interface
         , Canonical
         , AliasedCanonical
         , Home
+        , Infixes
         , Infix
         , parseInterface
         )
 
 {-|
 
-@docs Interface, Version, PackageName, Imports, Types, Unions, Aliases, UnionInfo, CanonicalVar, CanonicalModuleName, Exports, Export, Canonical, AliasedCanonical, Home,  Infix, parseInterface
+# Parse
 
-private :
+@docs parseInterface
 
-parseVersion, parsePackageName, parseImports, parseTypes, parseUnions, parseAliases, parseUnionInfo, parseCanonicalVar, parseCanonicalModuleName, parseHome, parseExports, parseCanonical, parseLambda, parseVar, parseType, parseApp, parseRecord, parseAliased, parseAliasedCanonical
+# Types
+
+@docs Interface, Version, PackageName, Imports, Types, Unions, Aliases, UnionInfo, CanonicalVar, CanonicalModuleName, Exports, Export, Canonical, AliasedCanonical, Home,  Infixes,  Infix
 
 -}
 
