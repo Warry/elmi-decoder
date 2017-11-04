@@ -172,14 +172,14 @@ parseInterface =
     lazy
         (\_ ->
             parse Interface
-                |= parseVersion
-                |= parsePackageName
-                |= parseExports
-                |= parseImports
-                |= parseTypes
-                |= parseUnions
-                |= parseAliases
-                |= parseInfixes
+                |. parseVersion
+                |. parsePackageName
+                |. parseExports
+                |. parseImports
+                |. parseTypes
+                |. parseUnions
+                |. parseAliases
+                |. parseInfixes
         )
 
 
@@ -187,17 +187,17 @@ parseInterface =
 parseVersion : Parser Version
 parseVersion =
     parse Version
-        |= parseInt
-        |= parseInt
-        |= parseInt
+        |. parseInt
+        |. parseInt
+        |. parseInt
 
 
 {-| -}
 parsePackageName : Parser PackageName
 parsePackageName =
     parse PackageName
-        |= parseString
-        |= parseString
+        |. parseString
+        |. parseString
 
 
 {-| -}
@@ -242,16 +242,16 @@ parseUnionInfo =
 parseCanonicalVar : Parser CanonicalVar
 parseCanonicalVar =
     parse CanonicalVar
-        |= parseHome
-        |= parseString
+        |. parseHome
+        |. parseString
 
 
 {-| -}
 parseCanonicalModuleName : Parser CanonicalModuleName
 parseCanonicalModuleName =
     parse CanonicalModuleName
-        |= parsePackageName
-        |= parseList parseString
+        |. parsePackageName
+        |. parseList parseString
 
 
 {-| -}
@@ -275,9 +275,9 @@ parseExports =
 parseExport : Parser Export
 parseExport =
     parseUnion
-        [ ( 0, parse ExportValue |= parseString )
-        , ( 1, parse ExportAlias |= parseString )
-        , ( 2, parse ExportUnion |= parseString |= parseListing )
+        [ ( 0, parse ExportValue |. parseString )
+        , ( 1, parse ExportAlias |. parseString )
+        , ( 2, parse ExportUnion |. parseString |. parseListing )
         ]
 
 
@@ -285,8 +285,8 @@ parseExport =
 parseListing : Parser Listing
 parseListing =
     parse Listing
-        |= parseList parseString
-        |= parseBool
+        |. parseList parseString
+        |. parseBool
 
 
 {-| -}
@@ -309,38 +309,38 @@ parseCanonical =
 parseLambda : Parser Canonical
 parseLambda =
     parse Lambda
-        |= parseCanonical
-        |= parseCanonical
+        |. parseCanonical
+        |. parseCanonical
 
 
 {-| -}
 parseVar : Parser Canonical
 parseVar =
     parse Var
-        |= parseString
+        |. parseString
 
 
 {-| -}
 parseType : Parser Canonical
 parseType =
     parse Type
-        |= parseCanonicalVar
+        |. parseCanonicalVar
 
 
 {-| -}
 parseApp : Parser Canonical
 parseApp =
     parse App
-        |= parseCanonical
-        |= parseList parseCanonical
+        |. parseCanonical
+        |. parseList parseCanonical
 
 
 {-| -}
 parseRecord : Parser Canonical
 parseRecord =
     parse Record
-        |= parseList (parseTuple parseString parseCanonical)
-        |= parseMaybe parseCanonical
+        |. parseList (parseTuple parseString parseCanonical)
+        |. parseMaybe parseCanonical
 
 
 {-| -}
@@ -349,9 +349,9 @@ parseAliased =
     lazy
         (\_ ->
             parse Aliased
-                |= parseCanonicalVar
-                |= parseList (parseTuple parseString parseCanonical)
-                |= parseAliasedCanonical
+                |. parseCanonicalVar
+                |. parseList (parseTuple parseString parseCanonical)
+                |. parseAliasedCanonical
         )
 
 
@@ -361,8 +361,8 @@ parseAliasedCanonical =
     lazy
         (\_ ->
             parseUnion
-                [ ( 0, parse Holley |= parseCanonical )
-                , ( 1, parse Filled |= parseCanonical )
+                [ ( 0, parse Holley |. parseCanonical )
+                , ( 1, parse Filled |. parseCanonical )
                 ]
         )
 
@@ -377,9 +377,9 @@ parseInfixes =
 parseInfix : Parser Infix
 parseInfix =
     parse Infix
-        |= parseString
-        |= parseAssoc
-        |= parseInt
+        |. parseString
+        |. parseAssoc
+        |. parseInt
 
 
 {-| -}
