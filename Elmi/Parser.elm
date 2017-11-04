@@ -239,3 +239,10 @@ parseBool tape =
 
         _ ->
             Err "Bool error"
+
+
+{-|
+-}
+lazy : (() -> Parser a) -> Parser a
+lazy fn =
+    \tape -> fn () tape
