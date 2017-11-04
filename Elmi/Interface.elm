@@ -11,12 +11,13 @@ module Elmi.Interface
         , CanonicalVar
         , CanonicalModuleName
         , Exports
-        , Export
-        , Canonical
-        , AliasedCanonical
-        , Home
+        , Export(..)
+        , Canonical(..)
+        , AliasedCanonical(..)
+        , Home(..)
         , Infixes
         , Infix
+        , Assoc(..)
         , parseInterface
         )
 
@@ -28,7 +29,7 @@ module Elmi.Interface
 
 # Types
 
-@docs Interface, Version, PackageName, Imports, Types, Unions, Aliases, UnionInfo, CanonicalVar, CanonicalModuleName, Exports, Export, Canonical, AliasedCanonical, Home,  Infixes,  Infix
+@docs Interface, Version, PackageName, Imports, Types, Unions, Aliases, UnionInfo, CanonicalVar, CanonicalModuleName, Exports, Export, Canonical, AliasedCanonical, Home,  Infixes,  Infix, Assoc
 
 -}
 
