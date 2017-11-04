@@ -8,13 +8,13 @@ module Elmi.Parser exposing (..)
 
 # Functions
 
-@docs take, andThen, (|=), with, (|.), parseInt, parseString, parseList, parseListHelp, parseUnion, parseTuple, parseMaybe, parseBool
+@docs take, andThen, (|.), with, (|=), parseInt, parseString, parseList, parseListHelp, parseUnion, parseTuple, parseMaybe, parseBool
 
 -}
 
 import Bitwise
 import Result
-import Elmi.Ascii
+import Ascii
 
 
 {-|
@@ -77,13 +77,13 @@ take length list =
         rest =
             List.drop length list
     in
-        Ok ( Debug.log (Elmi.Ascii.toString acc) acc, rest )
+        Ok ( acc, rest )
 
 
 {-|
 -}
-andThen : Parser (a -> b) -> Parser a -> Parser b
-andThen tagger next tape =
+app : Parser (a -> b) -> Parser a -> Parser b
+app tagger next tape =
     case tagger tape of
         Ok ( fn, tape_ ) ->
             map fn next tape_
@@ -94,15 +94,15 @@ andThen tagger next tape =
 
 {-|
 -}
-(|=) : Parser (a -> b) -> Parser a -> Parser b
-(|=) =
-    andThen
+(|.) : Parser (a -> b) -> Parser a -> Parser b
+(|.) =
+    app
 
 
 {-|
 -}
-with : Parser a -> (a -> Parser b) -> Parser b
-with tagger next tape =
+andThen : Parser a -> (a -> Parser b) -> Parser b
+andThen tagger next tape =
     case tagger tape of
         Ok ( value, tape_ ) ->
             next value tape_
@@ -113,9 +113,9 @@ with tagger next tape =
 
 {-|
 -}
-(|.) : Parser a -> (a -> Parser b) -> Parser b
-(|.) =
-    with
+(|=) : Parser a -> (a -> Parser b) -> Parser b
+(|=) =
+    andThen
 
 
 {-|
@@ -138,10 +138,10 @@ parseInt =
 parseString : Parser String
 parseString =
     parseInt
-        |. (\size tape ->
+        |= (\size tape ->
                 case take size tape of
                     Ok ( t, rest ) ->
-                        Ok ( Elmi.Ascii.toString t, rest )
+                        Ok ( Ascii.toString t, rest )
 
                     Err err ->
                         Err err
@@ -153,7 +153,7 @@ parseString =
 parseList : Parser a -> Parser (List a)
 parseList parser =
     parseInt
-        |. (\size ->
+        |= (\size ->
                 parseListHelp parser ( size, [] )
            )
 
@@ -163,7 +163,7 @@ parseList parser =
 parseListHelp : Parser a -> ( Int, List a ) -> Parser (List a)
 parseListHelp parser ( size, acc ) tape =
     if size == 0 then
-        Ok ( acc, tape )
+        Ok ( List.reverse acc, tape )
     else
         case parser tape of
             Ok ( item, tape_ ) ->
@@ -198,11 +198,12 @@ parseUnion choices tape =
 parseTuple : Parser a -> Parser b -> Parser ( a, b )
 parseTuple p1 p2 =
     parse (,)
-        |= p1
-        |= p2
+        |. p1
+        |. p2
 
 
 {-|
+-}
 parseMaybe : Parser a -> Parser (Maybe a)
 parseMaybe p tape =
     case tape of
@@ -215,15 +216,19 @@ parseMaybe p tape =
         _ ->
             Err ">>>>>"
 
--}
-parseMaybe : Parser a -> Parser (Maybe a)
-parseMaybe p tape =
-    case p tape of
-        Ok ( value, rest ) ->
-            Ok ( Just value, rest )
 
-        _ ->
-            Ok ( Nothing, tape )
+
+{-
+   parseMaybe : Parser a -> Parser (Maybe a)
+   parseMaybe p tape =
+       case p tape of
+           Ok ( value, rest ) ->
+               Ok ( Just value, rest )
+
+           _ ->
+               Ok ( Nothing, tape )
+
+-}
 
 
 {-|
@@ -239,3 +244,10 @@ parseBool tape =
 
         _ ->
             Err "Bool error"
+
+
+{-|
+-}
+lazy : (() -> Parser a) -> Parser a
+lazy fn tape =
+    fn () tape

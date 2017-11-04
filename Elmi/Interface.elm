@@ -29,7 +29,7 @@ parseVersion, parsePackageName, parseImports, parseTypes, parseUnions, parseAlia
 
 -}
 
-import Elmi.Ascii
+import Ascii
 import Elmi.Parser exposing (..)
 
 
@@ -45,7 +45,7 @@ type alias Interface =
     , types : Types
     , unions : Unions
     , aliases : Aliases
-    , fixities : Infix
+    , fixities : Infixes
     }
 
 
@@ -147,6 +147,11 @@ type Home
 
 
 {-| -}
+type alias Infixes =
+    List Infix
+
+
+{-| -}
 type alias Infix =
     { op : String
     , associativity : Assoc
@@ -164,32 +169,35 @@ type Assoc
 {-| -}
 parseInterface : Parser Interface
 parseInterface =
-    parse Interface
-        |= parseVersion
-        |= parsePackageName
-        |= parseExports
-        |= parseImports
-        |= parseTypes
-        |= parseUnions
-        |= parseAliases
-        |= parseInfix
+    lazy
+        (\_ ->
+            parse Interface
+                |. parseVersion
+                |. parsePackageName
+                |. parseExports
+                |. parseImports
+                |. parseTypes
+                |. parseUnions
+                |. parseAliases
+                |. parseInfixes
+        )
 
 
 {-| -}
 parseVersion : Parser Version
 parseVersion =
     parse Version
-        |= parseInt
-        |= parseInt
-        |= parseInt
+        |. parseInt
+        |. parseInt
+        |. parseInt
 
 
 {-| -}
 parsePackageName : Parser PackageName
 parsePackageName =
     parse PackageName
-        |= parseString
-        |= parseString
+        |. parseString
+        |. parseString
 
 
 {-| -}
@@ -234,28 +242,27 @@ parseUnionInfo =
 parseCanonicalVar : Parser CanonicalVar
 parseCanonicalVar =
     parse CanonicalVar
-        |= parseHome
-        |= parseString
+        |. parseHome
+        |. parseString
 
 
 {-| -}
 parseCanonicalModuleName : Parser CanonicalModuleName
 parseCanonicalModuleName =
     parse CanonicalModuleName
-        |= parsePackageName
-        |= parseList parseString
+        |. parsePackageName
+        |. parseList parseString
 
 
 {-| -}
 parseHome : Parser Home
-parseHome list =
+parseHome =
     parseUnion
         [ ( 0, parseEnum BuiltIn )
         , ( 1, map Module parseCanonicalModuleName )
         , ( 2, map TopLevel parseCanonicalModuleName )
         , ( 3, parseEnum Local )
         ]
-        list
 
 
 {-| -}
@@ -268,9 +275,9 @@ parseExports =
 parseExport : Parser Export
 parseExport =
     parseUnion
-        [ ( 0, parse ExportValue |= parseString )
-        , ( 1, parse ExportAlias |= parseString )
-        , ( 2, parse ExportUnion |= parseString |= parseListing )
+        [ ( 0, parse ExportValue |. parseString )
+        , ( 1, parse ExportAlias |. parseString )
+        , ( 2, parse ExportUnion |. parseString |. parseListing )
         ]
 
 
@@ -278,87 +285,101 @@ parseExport =
 parseListing : Parser Listing
 parseListing =
     parse Listing
-        |= parseList parseString
-        |= parseBool
+        |. parseList parseString
+        |. parseBool
 
 
 {-| -}
 parseCanonical : Parser Canonical
-parseCanonical list =
-    parseUnion
-        [ ( 0, parseLambda )
-        , ( 1, parseVar )
-        , ( 2, parseType )
-        , ( 3, parseApp )
-        , ( 4, parseRecord )
-        , ( 5, parseAliased )
-        ]
-        list
+parseCanonical =
+    lazy
+        (\_ ->
+            parseUnion
+                [ ( 0, parseLambda )
+                , ( 1, parseVar )
+                , ( 2, parseType )
+                , ( 3, parseApp )
+                , ( 4, parseRecord )
+                , ( 5, parseAliased )
+                ]
+        )
 
 
 {-| -}
 parseLambda : Parser Canonical
 parseLambda =
     parse Lambda
-        |= parseCanonical
-        |= parseCanonical
+        |. parseCanonical
+        |. parseCanonical
 
 
 {-| -}
 parseVar : Parser Canonical
 parseVar =
     parse Var
-        |= parseString
+        |. parseString
 
 
 {-| -}
 parseType : Parser Canonical
 parseType =
     parse Type
-        |= parseCanonicalVar
+        |. parseCanonicalVar
 
 
 {-| -}
 parseApp : Parser Canonical
 parseApp =
     parse App
-        |= parseCanonical
-        |= parseList parseCanonical
+        |. parseCanonical
+        |. parseList parseCanonical
 
 
 {-| -}
 parseRecord : Parser Canonical
 parseRecord =
     parse Record
-        |= parseList (parseTuple parseString parseCanonical)
-        |= parseMaybe parseCanonical
+        |. parseList (parseTuple parseString parseCanonical)
+        |. parseMaybe parseCanonical
 
 
 {-| -}
 parseAliased : Parser Canonical
 parseAliased =
-    parse Aliased
-        |= parseCanonicalVar
-        |= parseList (parseTuple parseString parseCanonical)
-        |= parseAliasedCanonical
+    lazy
+        (\_ ->
+            parse Aliased
+                |. parseCanonicalVar
+                |. parseList (parseTuple parseString parseCanonical)
+                |. parseAliasedCanonical
+        )
 
 
 {-| -}
 parseAliasedCanonical : Parser AliasedCanonical
 parseAliasedCanonical =
-    parseUnion
-        [ ( 0, parse Holley |= parseCanonical )
-        , ( 1, parse Filled |= parseCanonical )
-        ]
+    lazy
+        (\_ ->
+            parseUnion
+                [ ( 0, parse Holley |. parseCanonical )
+                , ( 1, parse Filled |. parseCanonical )
+                ]
+        )
+
+
+{-| -}
+parseInfixes : Parser (List Infix)
+parseInfixes =
+    parseList parseInfix
 
 
 {-| -}
 parseInfix : Parser Infix
 parseInfix =
     parse Infix
-        |= parseString
-        |= parseAssoc
-        |= parseInt
+        |. parseString
+        |. parseAssoc
+        |. parseInt
 
 
 {-| -}
