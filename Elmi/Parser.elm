@@ -14,7 +14,7 @@ module Elmi.Parser exposing (..)
 
 import Bitwise
 import Result
-import Elmi.Ascii
+import Ascii
 
 
 {-|
@@ -141,7 +141,7 @@ parseString =
         |= (\size tape ->
                 case take size tape of
                     Ok ( t, rest ) ->
-                        Ok ( Elmi.Ascii.toString t, rest )
+                        Ok ( Ascii.toString t, rest )
 
                     Err err ->
                         Err err
@@ -177,24 +177,20 @@ parseListHelp parser ( size, acc ) tape =
 -}
 parseUnion : List ( Int, Parser a ) -> Parser a
 parseUnion choices tape =
-    let
-        ddd =
-            Debug.log "?????" tape
-    in
-        case tape of
-            code :: rest ->
-                List.foldr
-                    (\( unionCode, parser ) value ->
-                        if code == unionCode then
-                            parser rest
-                        else
-                            value
-                    )
-                    (Err "Not in union.")
-                    choices
+    case tape of
+        code :: rest ->
+            List.foldr
+                (\( unionCode, parser ) value ->
+                    if code == unionCode then
+                        parser rest
+                    else
+                        value
+                )
+                (Err "Not in union.")
+                choices
 
-            [] ->
-                Err "List is too short."
+        [] ->
+            Err "List is too short."
 
 
 {-|

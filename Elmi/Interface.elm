@@ -29,7 +29,7 @@ parseVersion, parsePackageName, parseImports, parseTypes, parseUnions, parseAlia
 
 -}
 
-import Elmi.Ascii
+import Ascii
 import Elmi.Parser exposing (..)
 
 

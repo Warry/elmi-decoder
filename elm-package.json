@@ -1,13 +1,14 @@
 {
     "version": "1.0.0",
     "summary": "Decode HEX from elmi-files",
-    "repository": "https://github.com/warry/elmi-decoder.git",
+    "repository": "https://github.com/Warry/elmi-decoder.git",
     "license": "BSD3",
     "source-directories": [
         "."
     ],
-    "exposed-modules": [],
+    "exposed-modules": [ "Elmi.Interface" ],
     "dependencies": {
+        "Warry/ascii-table": "1.0.0 <= v < 2.0.0",
         "elm-community/json-extra": "2.5.0 <= v < 3.0.0",
         "elm-lang/core": "5.1.1 <= v < 6.0.0",
         "elm-lang/html": "2.0.0 <= v < 3.0.0"
