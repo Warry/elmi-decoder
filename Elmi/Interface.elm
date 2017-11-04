@@ -181,13 +181,10 @@ parseInterface =
 {-| -}
 parseVersion : Parser Version
 parseVersion =
-    lazy
-        (\_ ->
-            parse Version
-                |= parseInt
-                |= parseInt
-                |= parseInt
-        )
+    parse Version
+        |= parseInt
+        |= parseInt
+        |= parseInt
 
 
 {-| -}
@@ -207,114 +204,84 @@ parseImports =
 {-| -}
 parseTypes : Parser Types
 parseTypes =
-    lazy
-        (\_ ->
-            parseList (parseTuple parseString parseCanonical)
-        )
+    parseList (parseTuple parseString parseCanonical)
 
 
 {-| -}
 parseUnions : Parser Unions
 parseUnions =
-    lazy
-        (\_ ->
-            parseList (parseTuple parseString parseUnionInfo)
-        )
+    parseList (parseTuple parseString parseUnionInfo)
 
 
 {-| -}
 parseAliases : Parser Aliases
 parseAliases =
-    lazy
-        (\_ ->
-            parseList <|
-                parseTuple parseString (parseTuple (parseList parseString) parseCanonical)
-        )
+    parseList <|
+        parseTuple parseString (parseTuple (parseList parseString) parseCanonical)
 
 
 {-| -}
 parseUnionInfo : Parser UnionInfo
 parseUnionInfo =
-    lazy
-        (\_ ->
-            parseTuple
-                (parseList parseString)
-                (parseList
-                    (parseTuple
-                        parseString
-                        (parseList parseCanonical)
-                    )
-                )
+    parseTuple
+        (parseList parseString)
+        (parseList
+            (parseTuple
+                parseString
+                (parseList parseCanonical)
+            )
         )
 
 
 {-| -}
 parseCanonicalVar : Parser CanonicalVar
 parseCanonicalVar =
-    lazy
-        (\_ ->
-            parse CanonicalVar
-                |= parseHome
-                |= parseString
-        )
+    parse CanonicalVar
+        |= parseHome
+        |= parseString
 
 
 {-| -}
 parseCanonicalModuleName : Parser CanonicalModuleName
 parseCanonicalModuleName =
-    lazy
-        (\_ ->
-            parse CanonicalModuleName
-                |= parsePackageName
-                |= parseList parseString
-        )
+    parse CanonicalModuleName
+        |= parsePackageName
+        |= parseList parseString
 
 
 {-| -}
 parseHome : Parser Home
 parseHome =
-    lazy
-        (\_ ->
-            parseUnion
-                [ ( 0, parseEnum BuiltIn )
-                , ( 1, map Module parseCanonicalModuleName )
-                , ( 2, map TopLevel parseCanonicalModuleName )
-                , ( 3, parseEnum Local )
-                ]
-        )
+    parseUnion
+        [ ( 0, parseEnum BuiltIn )
+        , ( 1, map Module parseCanonicalModuleName )
+        , ( 2, map TopLevel parseCanonicalModuleName )
+        , ( 3, parseEnum Local )
+        ]
 
 
 {-| -}
 parseExports : Parser Exports
 parseExports =
-    lazy
-        (\_ ->
-            parseList parseExport
-        )
+    parseList parseExport
 
 
 {-| -}
 parseExport : Parser Export
 parseExport =
-    lazy
-        (\_ ->
-            parseUnion
-                [ ( 0, parse ExportValue |= parseString )
-                , ( 1, parse ExportAlias |= parseString )
-                , ( 2, parse ExportUnion |= parseString |= parseListing )
-                ]
-        )
+    parseUnion
+        [ ( 0, parse ExportValue |= parseString )
+        , ( 1, parse ExportAlias |= parseString )
+        , ( 2, parse ExportUnion |= parseString |= parseListing )
+        ]
 
 
 {-| -}
 parseListing : Parser Listing
 parseListing =
-    lazy
-        (\_ ->
-            parse Listing
-                |= parseList parseString
-                |= parseBool
-        )
+    parse Listing
+        |= parseList parseString
+        |= parseBool
 
 
 {-| -}
@@ -336,54 +303,39 @@ parseCanonical =
 {-| -}
 parseLambda : Parser Canonical
 parseLambda =
-    lazy
-        (\_ ->
-            parse Lambda
-                |= parseCanonical
-                |= parseCanonical
-        )
+    parse Lambda
+        |= parseCanonical
+        |= parseCanonical
 
 
 {-| -}
 parseVar : Parser Canonical
 parseVar =
-    lazy
-        (\_ ->
-            parse Var
-                |= parseString
-        )
+    parse Var
+        |= parseString
 
 
 {-| -}
 parseType : Parser Canonical
 parseType =
-    lazy
-        (\_ ->
-            parse Type
-                |= parseCanonicalVar
-        )
+    parse Type
+        |= parseCanonicalVar
 
 
 {-| -}
 parseApp : Parser Canonical
 parseApp =
-    lazy
-        (\_ ->
-            parse App
-                |= parseCanonical
-                |= parseList parseCanonical
-        )
+    parse App
+        |= parseCanonical
+        |= parseList parseCanonical
 
 
 {-| -}
 parseRecord : Parser Canonical
 parseRecord =
-    lazy
-        (\_ ->
-            parse Record
-                |= parseList (parseTuple parseString parseCanonical)
-                |= parseMaybe parseCanonical
-        )
+    parse Record
+        |= parseList (parseTuple parseString parseCanonical)
+        |= parseMaybe parseCanonical
 
 
 {-| -}
@@ -413,23 +365,17 @@ parseAliasedCanonical =
 {-| -}
 parseInfix : Parser Infix
 parseInfix =
-    lazy
-        (\_ ->
-            parse Infix
-                |= parseString
-                |= parseAssoc
-                |= parseInt
-        )
+    parse Infix
+        |= parseString
+        |= parseAssoc
+        |= parseInt
 
 
 {-| -}
 parseAssoc : Parser Assoc
 parseAssoc =
-    lazy
-        (\_ ->
-            parseUnion
-                [ ( 0, parseEnum L )
-                , ( 1, parseEnum N )
-                , ( 1, parseEnum R )
-                ]
-        )
+    parseUnion
+        [ ( 0, parseEnum L )
+        , ( 1, parseEnum N )
+        , ( 1, parseEnum R )
+        ]

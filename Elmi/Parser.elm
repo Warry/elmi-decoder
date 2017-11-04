@@ -177,20 +177,24 @@ parseListHelp parser ( size, acc ) tape =
 -}
 parseUnion : List ( Int, Parser a ) -> Parser a
 parseUnion choices tape =
-    case tape of
-        code :: rest ->
-            List.foldr
-                (\( unionCode, parser ) value ->
-                    if code == unionCode then
-                        parser rest
-                    else
-                        value
-                )
-                (Err "Not in union.")
-                choices
+    let
+        ddd =
+            Debug.log "?????" tape
+    in
+        case tape of
+            code :: rest ->
+                List.foldr
+                    (\( unionCode, parser ) value ->
+                        if code == unionCode then
+                            parser rest
+                        else
+                            value
+                    )
+                    (Err "Not in union.")
+                    choices
 
-        [] ->
-            Err "List is too short."
+            [] ->
+                Err "List is too short."
 
 
 {-|
@@ -203,6 +207,7 @@ parseTuple p1 p2 =
 
 
 {-|
+-}
 parseMaybe : Parser a -> Parser (Maybe a)
 parseMaybe p tape =
     case tape of
@@ -215,15 +220,19 @@ parseMaybe p tape =
         _ ->
             Err ">>>>>"
 
--}
-parseMaybe : Parser a -> Parser (Maybe a)
-parseMaybe p tape =
-    case p tape of
-        Ok ( value, rest ) ->
-            Ok ( Just value, rest )
 
-        _ ->
-            Ok ( Nothing, tape )
+
+{-
+   parseMaybe : Parser a -> Parser (Maybe a)
+   parseMaybe p tape =
+       case p tape of
+           Ok ( value, rest ) ->
+               Ok ( Just value, rest )
+
+           _ ->
+               Ok ( Nothing, tape )
+
+-}
 
 
 {-|
@@ -244,5 +253,5 @@ parseBool tape =
 {-|
 -}
 lazy : (() -> Parser a) -> Parser a
-lazy fn =
-    \tape -> fn () tape
+lazy fn tape =
+    fn () tape
